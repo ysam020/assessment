@@ -1,0 +1,25 @@
+{
+  "name": "@studyAbroad/prisma",
+  "version": "1.0.0",
+  "description": "Prisma client package for Study Abroad platform",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "generate": "dotenvx run -f ../../.env -- prisma generate --schema=./src/schema.prisma",
+    "push": "dotenvx run -f ../../.env -- prisma db push --schema=./src/schema.prisma",
+    "studio": "dotenvx run -f ../../.env -- prisma studio --schema=./src/schema.prisma",
+    "validate": "dotenvx run -f ../../.env -- prisma validate --schema=./src/schema.prisma",
+    "format": "dotenvx run -f ../../.env -- prisma format --schema=./src/schema.prisma"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.18.0",
+    "bcrypt": "^6.0.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.18.0",
+    "@dotenvx/dotenvx": "^1.51.0"
+  }
+}

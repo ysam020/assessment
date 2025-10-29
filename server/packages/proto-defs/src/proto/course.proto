@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package course;
+
+// ─────────────────────────────────────────────────────────────
+// COURSE UPLOAD MESSAGES
+// ─────────────────────────────────────────────────────────────
+
+message CourseUploadRequest {
+  repeated CourseData courses = 1;
+}
+
+message CourseData {
+  string course_id = 1;
+  string title = 2;
+  string description = 3;
+  string category = 4;
+  string instructor = 5;
+  string duration = 6;
+  string skill_level = 7;  // beginner, intermediate, advanced
+  repeated string tags = 8;
+}
+
+message CourseUploadResponse {
+  bool success = 1;
+  string message = 2;
+  int32 courses_uploaded = 3;
+  int32 courses_indexed = 4;
+}
+
+// ─────────────────────────────────────────────────────────────
+// COURSE SEARCH MESSAGES
+// ─────────────────────────────────────────────────────────────
+
+message CourseSearchRequest {
+  string query = 1;              // Search keyword
+  string category = 2;           // Filter by category
+  string instructor = 3;         // Filter by instructor
+  string skill_level = 4;        // Filter by skill level
+  int32 limit = 5;               // Number of results (default: 10)
+  int32 offset = 6;              // Pagination offset
+}
+
+message Course {
+  string id = 1;
+  string course_id = 2;
+  string title = 3;
+  string description = 4;
+  string category = 5;
+  string instructor = 6;
+  string duration = 7;
+  string skill_level = 8;
+  repeated string tags = 9;
+  float relevance_score = 10;    // Elasticsearch score
+}
+
+message CourseSearchResponse {
+  repeated Course courses = 1;
+  int32 total_count = 2;
+  string message = 3;
+  bool from_cache = 4;           // Indicates if result is from cache
+}
+
+// ─────────────────────────────────────────────────────────────
+// COURSE GET BY ID MESSAGES
+// ─────────────────────────────────────────────────────────────
+
+message CourseGetRequest {
+  string course_id = 1;
+}
+
+message CourseGetResponse {
+  Course course = 1;
+  string message = 2;
+  bool from_cache = 3;
+}
+
+// ─────────────────────────────────────────────────────────────
+// COURSE SERVICE DEFINITION
+// ─────────────────────────────────────────────────────────────
+
+service CourseService {
+  // Upload courses from CSV data
+  rpc UploadCourses(CourseUploadRequest) returns (CourseUploadResponse);
+  
+  // Search courses using Elasticsearch
+  rpc SearchCourses(CourseSearchRequest) returns (CourseSearchResponse);
+  
+  // Get course by ID (with Redis caching)
+  rpc GetCourse(CourseGetRequest) returns (CourseGetResponse);
+}

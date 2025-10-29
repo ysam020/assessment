@@ -1,0 +1,16 @@
+{
+  "node": {
+    "40bf5e05133d2d3d7fbb86eee6618ff81d095f4b2b": {
+      "workers": {
+        "app/course-match/page": {
+          "moduleId": "[project]/.next-internal/server/app/course-match/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/ai/flows/course-match.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/course-match/page": "action-browser"
+      }
+    }
+  },
+  "edge": {}
+}

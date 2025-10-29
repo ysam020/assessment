@@ -1,0 +1,176 @@
+version: "3.8"
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: studyabroad
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - microservices
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - microservices
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - microservices
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Auth Service (gRPC)
+  auth-service:
+    build:
+      context: .
+      dockerfile: apps/auth-service/Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "50051:50051"
+    environment:
+      - NODE_ENV=production
+      - AUTH_SERVICE_PORT=50051
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGODB_URI=mongodb://mongodb:27017/studyabroad
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - microservices
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'node -e "require(''net'').createConnection(50051,''localhost'')"',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Course Service (gRPC)
+  course-service:
+    build:
+      context: .
+      dockerfile: apps/course-service/Dockerfile
+    container_name: course-service
+    restart: unless-stopped
+    ports:
+      - "50053:50053"
+    environment:
+      - NODE_ENV=production
+      - COURSE_SERVICE_PORT=50053
+      - MONGODB_URI=mongodb://mongodb:27017/studyabroad
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - ELASTICSEARCH_NODE=http://elasticsearch:9200
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - microservices
+
+  # Recommendation Service (gRPC)
+  recommendation-service:
+    build:
+      context: .
+      dockerfile: apps/recommendation-service/Dockerfile
+    container_name: recommendation-service
+    restart: unless-stopped
+    ports:
+      - "50052:50052"
+    environment:
+      - NODE_ENV=production
+      - RECOMMENDATION_SERVICE_PORT=50052
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      - microservices
+
+  # API Gateway (HTTP/REST)
+  api-gateway:
+    build:
+      context: .
+      dockerfile: apps/api-gateway-service/Dockerfile
+    container_name: api-gateway
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      - NODE_ENV=production
+      - API_GATEWAY_PORT=9000
+      - JWT_SECRET=${JWT_SECRET}
+      - CLIENT_URL=http://localhost:3000
+      - AUTH_SERVICE_ADDRESS=auth-service:50051
+      - COURSE_SERVICE_ADDRESS=course-service:50053
+      - RECOMMENDATION_SERVICE_ADDRESS=recommendation-service:50052
+    depends_on:
+      - auth-service
+      - course-service
+      - recommendation-service
+    networks:
+      - microservices
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9000/api/v1/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  microservices:
+    driver: bridge
+
+volumes:
+  mongo_data:
+    driver: local
+  es_data:
+    driver: local

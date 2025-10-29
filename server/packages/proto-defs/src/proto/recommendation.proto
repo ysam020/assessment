@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package recommendation;
+
+// Request message for course recommendations
+message RecommendationRequest {
+  repeated string topics = 1;  // Array of topics (e.g., ["JavaScript", "React"])
+  string skill_level = 2;      // Skill level: "beginner", "intermediate", "advanced"
+  string preferred_duration = 3; // Optional: preferred duration (e.g., "short", "long")
+  int32 limit = 4;             // Number of recommendations to return (default: 5)
+}
+
+// Single course recommendation
+message CourseRecommendation {
+  string title = 1;
+  string description = 2;
+  string category = 3;
+  string skill_level = 4;
+  string duration = 5;
+  string instructor = 6;
+  float relevance_score = 7;   // 0-1 score indicating relevance
+  repeated string topics = 8;  // Matching topics
+}
+
+// Response message with recommendations
+message RecommendationResponse {
+  repeated CourseRecommendation recommendations = 1;
+  string message = 2;
+  int32 total_count = 3;
+}
+
+// Recommendation Service
+service RecommendationService {
+  // Get course recommendations based on user preferences
+  rpc GetRecommendations (RecommendationRequest) returns (RecommendationResponse);
+}

@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+  rpc Signup (SignupRequest) returns (AuthResponse);
+  rpc Signin (SigninRequest) returns (AuthResponse);
+  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse);
+}
+
+message SignupRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message SigninRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message RefreshTokenRequest {
+  string refreshToken = 1;
+}
+
+message User {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+  string role = 4;
+  string createdAt = 5;
+}
+
+message AuthResponse {
+  User user = 1;
+  string accessToken = 2;
+  string refreshToken = 3;
+}
+
+message RefreshTokenResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+}

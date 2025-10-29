@@ -1,0 +1,35 @@
+{
+  "name": "@studyAbroad/proto-defs",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "main": "./src/compiled/index.js",
+  "types": "./src/compiled/index.d.ts",
+  "exports": {
+    "./auth": {
+      "types": "./src/compiled/auth.d.ts",
+      "default": "./src/compiled/auth.js"
+    },
+    "./recommendation": {
+      "types": "./src/compiled/recommendation.d.ts",
+      "default": "./src/compiled/recommendation.js"
+    },
+    "./course": {
+      "types": "./src/compiled/course.d.ts",
+      "default": "./src/compiled/course.js"
+    }
+  },
+  "scripts": {
+    "proto:gen": "node src/generate_proto.mjs",
+    "proto:compile": "tsc",
+    "build": "npm run proto:gen && npm run proto:compile",
+    "clean": "rm -rf src/generated src/compiled"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.0"
+  },
+  "devDependencies": {
+    "ts-proto": "^2.7.7",
+    "typescript": "^5.9.2"
+  }
+}

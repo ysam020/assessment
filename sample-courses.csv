@@ -1,0 +1,11 @@
+course_id,title,description,category,instructor,duration,skill_level,tags
+CS101,Introduction to Computer Science,Learn the fundamentals of computer science including algorithms and data structures,Computer Science,Dr. John Smith,12 weeks,beginner,"programming,algorithms,fundamentals"
+WD201,Full Stack Web Development,Master modern web development with React Node.js and MongoDB,Web Development,Jane Doe,16 weeks,intermediate,"javascript,react,nodejs,mongodb"
+DS301,Data Science with Python,Comprehensive data science course covering pandas numpy and machine learning,Data Science,Prof. Sarah Johnson,14 weeks,advanced,"python,machine learning,data analysis"
+ML401,Machine Learning Fundamentals,Introduction to machine learning algorithms and their applications,Machine Learning,Dr. Michael Chen,10 weeks,intermediate,"python,machine learning,AI"
+MOB101,Mobile App Development,Build native mobile applications for iOS and Android,Mobile Development,Alex Martinez,12 weeks,beginner,"swift,kotlin,mobile"
+CYB201,Cybersecurity Basics,Learn essential cybersecurity concepts and best practices,Cybersecurity,Emily Brown,8 weeks,beginner,"security,networking,ethical hacking"
+AI301,Artificial Intelligence,Deep dive into AI concepts including neural networks and deep learning,Artificial Intelligence,Dr. David Lee,18 weeks,advanced,"AI,deep learning,neural networks"
+DB101,Database Management,Master SQL and NoSQL databases for modern applications,Database,Robert Wilson,10 weeks,beginner,"sql,mongodb,database design"
+CL201,Cloud Computing with AWS,Learn cloud infrastructure and services using Amazon Web Services,Cloud Computing,Lisa Anderson,12 weeks,intermediate,"aws,cloud,devops"
+UI301,UI/UX Design Principles,Create beautiful and user-friendly interfaces,Design,Maria Garcia,8 weeks,intermediate,"design,ui,ux,figma"

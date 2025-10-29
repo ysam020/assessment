@@ -1,0 +1,86 @@
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// USER MODEL 
+model User {
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  email        String    @unique
+  password     String
+  role         String    @default("admin")
+  refreshToken String?
+  lastLogin    DateTime?
+  
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  // Relations
+  coursesCreated Course[] @relation("InstructorCourses")
+  
+  @@map("users")
+}
+
+// COURSE MODEL
+model Course {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  courseId    String   @unique // Custom course identifier
+  title       String
+  description String
+  category    String
+  instructor  String
+  duration    String
+  price       Float?
+  isActive    Boolean  @default(true)
+  
+  // For search and recommendations
+  tags        String[] 
+  skillLevel  String   @default("beginner") // beginner, intermediate, advanced
+  language    String   @default("english")
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  instructorUser   User?   @relation("InstructorCourses", fields: [instructorUserId], references: [id])
+  instructorUserId String? @db.ObjectId
+  
+  @@index([category])
+  @@index([skillLevel])
+  @@index([isActive])
+  @@map("courses")
+}
+
+// RECOMMENDATION MODEL
+model Recommendation {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String?  
+  preferences Json     
+  courses     String[] 
+  
+  createdAt   DateTime @default(now())
+  
+  @@map("recommendations")
+}
+
+// SEARCH LOG MODEL
+model SearchLog {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  query      String
+  filters    Json?    
+  results    Int      
+  userId     String?  
+  
+  createdAt  DateTime @default(now())
+  
+  @@index([query])
+  @@map("search_logs")
+}
